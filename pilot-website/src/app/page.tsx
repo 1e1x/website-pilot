@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
+import type React from "react";
+import { useEffect, useState } from "react";
 
 import {
   ChevronLeft,
@@ -14,9 +14,14 @@ import {
   Users,
   Clock,
   MapPin,
-} from "lucide-react"
-import { Button } from "~/components/ui/button"
-import { Card, CardContent } from "~/components/ui/card"
+} from "lucide-react";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent } from "~/components/ui/card";
+import Link from "next/link";
+import { auth } from "~/server/auth";
+import { useRouter } from "next/navigation";
+import { getSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 
 // Data definitions
 const membersData = [
@@ -52,21 +57,37 @@ const membersData = [
     id: "mem-shahim",
     name: "Shahim",
     roles: ["Videographer", "Motion Graphics Artist"],
-    skills: ["Adobe Premiere Pro", "After Effects", "Cinematography", "Storyboarding"],
+    skills: [
+      "Adobe Premiere Pro",
+      "After Effects",
+      "Cinematography",
+      "Storyboarding",
+    ],
     avatar_url: "/placeholder.svg?height=100&width=100",
   },
   {
     id: "mem-zaid",
     name: "Zaid",
     roles: ["Videographer", "Social Media Manager"],
-    skills: ["Videography", "Content Creation", "Community Management", "Social Media Strategy"],
+    skills: [
+      "Videography",
+      "Content Creation",
+      "Community Management",
+      "Social Media Strategy",
+    ],
     avatar_url: "/placeholder.svg?height=100&width=100",
   },
   {
     id: "mem-amin",
     name: "Amin",
     roles: ["Graphic Designer", "Social Media Specialist"],
-    skills: ["Adobe Photoshop", "Illustrator", "InDesign", "Branding", "Digital Marketing"],
+    skills: [
+      "Adobe Photoshop",
+      "Illustrator",
+      "InDesign",
+      "Branding",
+      "Digital Marketing",
+    ],
     avatar_url: "/placeholder.svg?height=100&width=100",
   },
   {
@@ -80,7 +101,12 @@ const membersData = [
     id: "mem-abdulla",
     name: "Abdulla",
     roles: ["Cybersecurity Specialist", "Python Developer"],
-    skills: ["Network Security", "Penetration Testing", "Python Scripting", "Ethical Hacking"],
+    skills: [
+      "Network Security",
+      "Penetration Testing",
+      "Python Scripting",
+      "Ethical Hacking",
+    ],
     avatar_url: "/placeholder.svg?height=100&width=100",
   },
   {
@@ -90,7 +116,7 @@ const membersData = [
     skills: ["Vue.js", "HTML", "CSS", "UI Development", "Git"],
     avatar_url: "/placeholder.svg?height=100&width=100",
   },
-]
+];
 
 const projectsData = [
   {
@@ -141,7 +167,7 @@ const projectsData = [
     likes_count: 156,
     comments_count: 43,
   },
-]
+];
 
 const contestsData = [
   {
@@ -184,7 +210,7 @@ const contestsData = [
     prize_pool: "QAR 15,000",
     teams_registered_count: 18,
   },
-]
+];
 
 const workshopsData = [
   {
@@ -227,122 +253,144 @@ const workshopsData = [
     event_time: "10:00 AM",
     location: "Online",
   },
-]
+];
 
 // Helper function to get member by ID
 function getMemberById(memberId: string) {
-  return membersData.find((member) => member.id === memberId)
+  return membersData.find((member) => member.id === memberId);
 }
 
 // Carousel component
-function Carousel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  const [scrollPosition, setScrollPosition] = useState(0)
-  const [containerRef, setContainerRef] = useState<HTMLDivElement | null>(null)
+function Carousel({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const [scrollPosition, setScrollPosition] = useState(0);
+  const [containerRef, setContainerRef] = useState<HTMLDivElement | null>(null);
 
   const scroll = (direction: "left" | "right") => {
     if (containerRef) {
-      const scrollAmount = 320
+      const scrollAmount = 320;
       const newPosition =
-        direction === "left" ? Math.max(0, scrollPosition - scrollAmount) : scrollPosition + scrollAmount
+        direction === "left"
+          ? Math.max(0, scrollPosition - scrollAmount)
+          : scrollPosition + scrollAmount;
 
       containerRef.scrollTo({
         left: newPosition,
         behavior: "smooth",
-      })
-      setScrollPosition(newPosition)
+      });
+      setScrollPosition(newPosition);
     }
-  }
+  };
 
   return (
     <div className="relative">
       <Button
         variant="outline"
         size="icon"
-        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 rounded-full bg-white shadow-lg"
+        className="absolute top-1/2 left-0 z-10 -translate-y-1/2 rounded-full bg-white shadow-lg"
         onClick={() => scroll("left")}
       >
         <ChevronLeft className="h-4 w-4" />
       </Button>
-      <div ref={setContainerRef} className={`flex gap-6 overflow-x-hidden scroll-smooth pb-4 ${className}`}>
+      <div
+        ref={setContainerRef}
+        className={`flex gap-6 overflow-x-hidden scroll-smooth pb-4 ${className}`}
+      >
         {children}
       </div>
       <Button
         variant="outline"
         size="icon"
-        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 rounded-full bg-white shadow-lg"
+        className="absolute top-1/2 right-0 z-10 -translate-y-1/2 rounded-full bg-white shadow-lg"
         onClick={() => scroll("right")}
       >
         <ChevronRight className="h-4 w-4" />
       </Button>
     </div>
-  )
+  );
 }
 
 // Project Card component
 function ProjectCard({ project }: { project: (typeof projectsData)[0] }) {
-  const owner = getMemberById(project.owner_id)
+  const owner = getMemberById(project.owner_id);
 
   return (
     <a href={`/project/${project.id}`} className="block">
-      <Card className="flex-shrink-0 w-80 hover:shadow-lg transition-shadow">
-        <div className="aspect-video bg-gray-100 rounded-t-lg overflow-hidden">
+      <Card className="w-80 flex-shrink-0 transition-shadow hover:shadow-lg">
+        <div className="aspect-video overflow-hidden rounded-t-lg bg-gray-100">
           <img
             src={project.image_url || "/placeholder.svg"}
             alt={project.name}
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover"
           />
         </div>
         <CardContent className="p-6">
-          <h3 className="font-semibold text-lg mb-2 truncate">{project.name}</h3>
-          <p className="text-gray-600 text-sm mb-4 line-clamp-3">{project.description}</p>
-          <div className="flex items-center text-sm text-gray-500 mb-3">
-            <User className="h-4 w-4 mr-2" />
+          <h3 className="mb-2 truncate text-lg font-semibold">
+            {project.name}
+          </h3>
+          <p className="mb-4 line-clamp-3 text-sm text-gray-600">
+            {project.description}
+          </p>
+          <div className="mb-3 flex items-center text-sm text-gray-500">
+            <User className="mr-2 h-4 w-4" />
             <span>{owner ? owner.name : "Unknown"}</span>
           </div>
-          <div className="flex flex-wrap gap-1 mb-4">
+          <div className="mb-4 flex flex-wrap gap-1">
             {project.tags.map((tag) => (
-              <span key={tag} className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
+              <span
+                key={tag}
+                className="rounded bg-gray-100 px-2 py-1 text-xs text-gray-700"
+              >
                 {tag}
               </span>
             ))}
           </div>
           <div className="flex items-center gap-4 text-sm text-gray-500">
             <div className="flex items-center">
-              <Heart className="h-4 w-4 mr-1" />
+              <Heart className="mr-1 h-4 w-4" />
               <span>{project.likes_count}</span>
             </div>
             <div className="flex items-center">
-              <MessageCircle className="h-4 w-4 mr-1" />
+              <MessageCircle className="mr-1 h-4 w-4" />
               <span>{project.comments_count}</span>
             </div>
           </div>
         </CardContent>
       </Card>
     </a>
-  )
+  );
 }
 
 // Talent Card component
 function TalentCard({ member }: { member: (typeof membersData)[0] }) {
   return (
-    <Card className="flex-shrink-0 w-72 hover:shadow-lg transition-shadow">
+    <Card className="w-72 flex-shrink-0 transition-shadow hover:shadow-lg">
       <CardContent className="p-6 text-center">
         <div className="mb-4">
           <img
             src={member.avatar_url || "/placeholder.svg"}
             alt={member.name}
-            className="w-20 h-20 rounded-full mx-auto border-2 border-gray-200 object-cover"
+            className="mx-auto h-20 w-20 rounded-full border-2 border-gray-200 object-cover"
           />
         </div>
-        <h3 className="font-semibold text-lg mb-1">{member.name}</h3>
-        <p className="text-gray-600 text-sm mb-3 line-clamp-2">{member.roles.join(", ")}</p>
-        <p className="text-gray-500 text-xs mb-4 line-clamp-3">{member.skills.join(", ")}</p>
+        <h3 className="mb-1 text-lg font-semibold">{member.name}</h3>
+        <p className="mb-3 line-clamp-2 text-sm text-gray-600">
+          {member.roles.join(", ")}
+        </p>
+        <p className="mb-4 line-clamp-3 text-xs text-gray-500">
+          {member.skills.join(", ")}
+        </p>
         <Button size="sm" className="w-full">
           View Profile
         </Button>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Contest Card component
@@ -350,35 +398,39 @@ function ContestCard({ contest }: { contest: (typeof contestsData)[0] }) {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "upcoming":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-100 text-yellow-800";
       case "live":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "past":
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   return (
-    <Card className="flex-shrink-0 w-80 hover:shadow-lg transition-shadow">
+    <Card className="w-80 flex-shrink-0 transition-shadow hover:shadow-lg">
       <CardContent className="p-6">
-        <span className={`inline-block px-3 py-1 rounded text-xs font-medium mb-3 ${getStatusColor(contest.status)}`}>
+        <span
+          className={`mb-3 inline-block rounded px-3 py-1 text-xs font-medium ${getStatusColor(contest.status)}`}
+        >
           {contest.status}
         </span>
-        <h3 className="font-semibold text-lg mb-2">{contest.name}</h3>
-        <p className="text-gray-600 text-sm mb-4 line-clamp-3">{contest.description}</p>
-        <div className="space-y-2 text-sm text-gray-500 mb-4">
+        <h3 className="mb-2 text-lg font-semibold">{contest.name}</h3>
+        <p className="mb-4 line-clamp-3 text-sm text-gray-600">
+          {contest.description}
+        </p>
+        <div className="mb-4 space-y-2 text-sm text-gray-500">
           <div className="flex items-center">
-            <Calendar className="h-4 w-4 mr-2" />
+            <Calendar className="mr-2 h-4 w-4" />
             <span>{contest.event_date}</span>
           </div>
           <div className="flex items-center">
-            <Trophy className="h-4 w-4 mr-2" />
+            <Trophy className="mr-2 h-4 w-4" />
             <span>{contest.prize_pool}</span>
           </div>
           <div className="flex items-center">
-            <Users className="h-4 w-4 mr-2" />
+            <Users className="mr-2 h-4 w-4" />
             <span>{contest.teams_registered_count} Teams</span>
           </div>
         </div>
@@ -387,34 +439,38 @@ function ContestCard({ contest }: { contest: (typeof contestsData)[0] }) {
         </Button>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Workshop Card component
 function WorkshopCard({ workshop }: { workshop: (typeof workshopsData)[0] }) {
   return (
-    <Card className="flex-shrink-0 w-80 hover:shadow-lg transition-shadow">
-      <div className="aspect-video bg-gray-100 rounded-t-lg overflow-hidden">
+    <Card className="w-80 flex-shrink-0 transition-shadow hover:shadow-lg">
+      <div className="aspect-video overflow-hidden rounded-t-lg bg-gray-100">
         <img
           src={workshop.image_url || "/placeholder.svg"}
           alt={workshop.name}
-          className="w-full h-full object-cover"
+          className="h-full w-full object-cover"
         />
       </div>
       <CardContent className="p-6">
-        <h3 className="font-semibold text-lg mb-2 line-clamp-2">{workshop.name}</h3>
-        <p className="text-gray-600 text-sm mb-4 line-clamp-3">{workshop.description}</p>
-        <div className="space-y-1 text-sm text-gray-500 mb-4">
+        <h3 className="mb-2 line-clamp-2 text-lg font-semibold">
+          {workshop.name}
+        </h3>
+        <p className="mb-4 line-clamp-3 text-sm text-gray-600">
+          {workshop.description}
+        </p>
+        <div className="mb-4 space-y-1 text-sm text-gray-500">
           <div className="flex items-center">
-            <Calendar className="h-4 w-4 mr-2" />
+            <Calendar className="mr-2 h-4 w-4" />
             <span>{workshop.event_date}</span>
           </div>
           <div className="flex items-center">
-            <Clock className="h-4 w-4 mr-2" />
+            <Clock className="mr-2 h-4 w-4" />
             <span>{workshop.event_time}</span>
           </div>
           <div className="flex items-center">
-            <MapPin className="h-4 w-4 mr-2" />
+            <MapPin className="mr-2 h-4 w-4" />
             <span>{workshop.location}</span>
           </div>
         </div>
@@ -423,67 +479,115 @@ function WorkshopCard({ workshop }: { workshop: (typeof workshopsData)[0] }) {
         </Button>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export default function HomePage() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [session, setSession] = useState<Object | null>(null);
+
+  useEffect(() => {
+    async function checkAuth() {
+      const currentSession = await getSession();
+      setSession(currentSession);
+
+      if (!currentSession) {
+        router.push("/login");
+        console.log("No session", currentSession);
+      } else {
+        console.log("Session found", currentSession);
+      }
+
+      setLoading(false);
+    }
+
+    checkAuth();
+  }, [router]);
+
+  if (loading) return <p>Loading...</p>;
+
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-sm border-b border-gray-200 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="font-bold text-xl">1e1x</div>
-            <div className="hidden md:flex space-x-8">
-              <a href="#projects" className="text-gray-600 hover:text-black transition-colors">
+      <nav className="fixed top-0 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur-sm">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
+            <div className="text-xl font-bold">1e1x</div>
+            <div className="hidden space-x-8 md:flex">
+              <a
+                href="#projects"
+                className="text-gray-600 transition-colors hover:text-black"
+              >
                 Projects
               </a>
-              <a href="#talent" className="text-gray-600 hover:text-black transition-colors">
+              <a
+                href="#talent"
+                className="text-gray-600 transition-colors hover:text-black"
+              >
                 Talent
               </a>
-              <a href="#arena" className="text-gray-600 hover:text-black transition-colors">
+              <a
+                href="#arena"
+                className="text-gray-600 transition-colors hover:text-black"
+              >
                 Arena
               </a>
-              <a href="#workshops" className="text-gray-600 hover:text-black transition-colors">
+              <a
+                href="#workshops"
+                className="text-gray-600 transition-colors hover:text-black"
+              >
                 Workshops
               </a>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="outline" size="sm">
-                Sign In
+              <Button onClick={() => signOut()} variant="outline" size="sm">
+                Log out
               </Button>
-              <Button size="sm">Log In</Button>
+              <Button  variant="outline" size="sm">
+                Sign Up
+              </Button>
+
+              <Link href="/login">
+                <Button size="sm">{session? session.user.name : "Log In"}</Button>
+              </Link>
             </div>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="bg-gray-50 pt-24 pb-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-black mb-6">Ignite Your Ideas. Build the Future. 🔥</h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Connect with brilliant minds, launch groundbreaking projects, and elevate your skills in Qatar's premier
-            innovation ecosystem.
+      <section className="bg-gray-50 px-4 pt-24 pb-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-4xl text-center">
+          <h1 className="mb-6 text-4xl font-bold text-black md:text-5xl">
+            Ignite Your Ideas. Build the Future. 🔥
+          </h1>
+          <p className="mx-auto mb-8 max-w-3xl text-xl text-gray-600">
+            Connect with brilliant minds, launch groundbreaking projects, and
+            elevate your skills in Qatar's premier innovation ecosystem.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <Button size="lg" className="px-8">
               Explore Projects
             </Button>
             <Button variant="outline" size="lg" className="px-8">
               Find Talent
             </Button>
+
           </div>
         </div>
       </section>
 
       {/* Featured Projects */}
-      <section id="projects" className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Featured Projects ✨</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Dive into innovative ventures shaping tomorrow. Discover, support, and join impactful projects!
+      <section id="projects" className="px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-12 text-center">
+            <h2 className="mb-4 text-3xl font-bold md:text-4xl">
+              Featured Projects ✨
+            </h2>
+            <p className="mx-auto max-w-3xl text-xl text-gray-600">
+              Dive into innovative ventures shaping tomorrow. Discover, support,
+              and join impactful projects!
             </p>
           </div>
           <Carousel>
@@ -491,19 +595,22 @@ export default function HomePage() {
               <ProjectCard key={project.id} project={project} />
             ))}
           </Carousel>
-          <div className="text-center mt-12">
+          <div className="mt-12 text-center">
             <Button variant="outline">View All Projects</Button>
           </div>
         </div>
       </section>
 
       {/* Featured Talent */}
-      <section id="talent" className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Featured Talent 🌟</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Meet the brilliant minds driving innovation. Find collaborators, mentors, or future team members.
+      <section id="talent" className="bg-gray-50 px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-12 text-center">
+            <h2 className="mb-4 text-3xl font-bold md:text-4xl">
+              Featured Talent 🌟
+            </h2>
+            <p className="mx-auto max-w-3xl text-xl text-gray-600">
+              Meet the brilliant minds driving innovation. Find collaborators,
+              mentors, or future team members.
             </p>
           </div>
           <Carousel>
@@ -511,19 +618,22 @@ export default function HomePage() {
               <TalentCard key={member.id} member={member} />
             ))}
           </Carousel>
-          <div className="text-center mt-12">
+          <div className="mt-12 text-center">
             <Button variant="outline">View All Talent</Button>
           </div>
         </div>
       </section>
 
       {/* Arena Challenges */}
-      <section id="arena" className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Arena Challenges 🏆</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Test your skills, compete, and win! Join our thrilling coding competitions and hackathons.
+      <section id="arena" className="px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-12 text-center">
+            <h2 className="mb-4 text-3xl font-bold md:text-4xl">
+              Arena Challenges 🏆
+            </h2>
+            <p className="mx-auto max-w-3xl text-xl text-gray-600">
+              Test your skills, compete, and win! Join our thrilling coding
+              competitions and hackathons.
             </p>
           </div>
           <Carousel>
@@ -531,19 +641,22 @@ export default function HomePage() {
               <ContestCard key={contest.id} contest={contest} />
             ))}
           </Carousel>
-          <div className="text-center mt-12">
+          <div className="mt-12 text-center">
             <Button variant="outline">View All Challenges</Button>
           </div>
         </div>
       </section>
 
       {/* Workshops & Training */}
-      <section id="workshops" className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Workshops & Training 📚</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Level up your expertise with our hands-on workshops and intensive training programs.
+      <section id="workshops" className="bg-gray-50 px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-12 text-center">
+            <h2 className="mb-4 text-3xl font-bold md:text-4xl">
+              Workshops & Training 📚
+            </h2>
+            <p className="mx-auto max-w-3xl text-xl text-gray-600">
+              Level up your expertise with our hands-on workshops and intensive
+              training programs.
             </p>
           </div>
           <Carousel>
@@ -551,22 +664,22 @@ export default function HomePage() {
               <WorkshopCard key={workshop.id} workshop={workshop} />
             ))}
           </Carousel>
-          <div className="text-center mt-12">
+          <div className="mt-12 text-center">
             <Button variant="outline">View All Workshops</Button>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
+      <footer className="bg-gray-900 px-4 py-12 text-gray-400 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl text-center">
           <p className="mb-6">© 2025 1e1x. All rights reserved.</p>
           <div className="flex justify-center space-x-6">
             <a
               href="https://www.instagram.com/1e1x_qatar/"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-white transition-colors"
+              className="transition-colors hover:text-white"
             >
               Instagram
             </a>
@@ -574,7 +687,7 @@ export default function HomePage() {
               href="https://twitter.com/1e1x_qatar/"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-white transition-colors"
+              className="transition-colors hover:text-white"
             >
               Twitter
             </a>
@@ -582,7 +695,7 @@ export default function HomePage() {
               href="https://www.linkedin.com/company/1e1x/"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-white transition-colors"
+              className="transition-colors hover:text-white"
             >
               LinkedIn
             </a>
@@ -590,7 +703,7 @@ export default function HomePage() {
               href="https://www.facebook.com/1e1x.qatar/"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-white transition-colors"
+              className="transition-colors hover:text-white"
             >
               Facebook
             </a>
@@ -598,5 +711,5 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
-  )
+  );
 }
