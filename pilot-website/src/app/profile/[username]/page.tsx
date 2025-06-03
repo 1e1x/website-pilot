@@ -30,7 +30,8 @@ export default function UserProfilePage({
 }: {
   params: { username: string };
 }) {
-  const { username } = params;
+  // const { username } = params;
+  const username = params.username as string;
   const [userData, setUserData] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState<any>(null);
