@@ -32,25 +32,25 @@ export default function Navigation() {
           </div>
           <div className="hidden space-x-8 md:flex">
             <a
-              href="#projects"
+              href="/projects"
               className="text-gray-600 transition-colors hover:text-black"
             >
               Projects
             </a>
             <a
-              href="#talent"
+              href="/talent"
               className="text-gray-600 transition-colors hover:text-black"
             >
               Talent
             </a>
             <a
-              href="#arena"
+              href="/arena"
               className="text-gray-600 transition-colors hover:text-black"
             >
               Arena
             </a>
             <a
-              href="#workshops"
+              href="/workshops"
               className="text-gray-600 transition-colors hover:text-black"
             >
               Workshops
