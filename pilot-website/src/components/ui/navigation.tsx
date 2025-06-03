@@ -5,11 +5,13 @@ import { Button } from "~/components/ui/button";
 import { Link } from "lucide-react";
 import { getSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import type { Session } from "next-auth";
+
 
 export default function Navigation() {
   const router = useRouter();
 
-  const [session, setSession] = useState<Object | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
     async function checkAuth() {

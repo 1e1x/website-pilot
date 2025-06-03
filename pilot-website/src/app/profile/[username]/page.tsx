@@ -21,6 +21,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import type { Session } from "next-auth";
 import { getSession } from "next-auth/react";
 import { getUserByIdAction } from "~/app/actions/server-actions";
 
@@ -41,7 +42,7 @@ export default function UserProfilePage({
 
   const router = useRouter();
 
-  const [session, setSession] = useState<Object | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
     async function checkAuth() {
