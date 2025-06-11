@@ -25,16 +25,18 @@ import type { Session } from "next-auth";
 import { getSession } from "next-auth/react";
 import { getUserByIdAction } from "~/app/actions/server-actions";
 
-interface PageProps {
-  params: {
-    username: string;
-  };
-}
+// interface PageProps {
+//   params: {
+//     username: string;
+//   };
+// }
 
-export default function UserProfilePage({ params }: PageProps) {
+export default function UserProfilePage({
+  params
+}: {
+  params: { username: string }
+}) {
   const { username } = params;
-  // const { username } = params;
-  // const username = params.username as string;
   const [userData, setUserData] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState<any>(null);
@@ -78,7 +80,7 @@ export default function UserProfilePage({ params }: PageProps) {
       }
     }
     loadUser();
-  }, [session]);
+  }, [session, username]);
 
   const handleSave = async () => {
     setIsLoading(true);
