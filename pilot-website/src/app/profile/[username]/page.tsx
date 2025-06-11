@@ -34,7 +34,7 @@ import { getUserByIdAction } from "~/app/actions/server-actions";
 export default function UserProfilePage({
   params
 }: {
-  params: { username: string }
+  params: { username: string } & Record<string, any>
 }) {
   const { username } = params;
   const [userData, setUserData] = useState<any>(null);
