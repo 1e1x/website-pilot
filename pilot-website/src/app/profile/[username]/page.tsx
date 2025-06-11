@@ -25,13 +25,16 @@ import type { Session } from "next-auth";
 import { getSession } from "next-auth/react";
 import { getUserByIdAction } from "~/app/actions/server-actions";
 
-export default function UserProfilePage({
-  params,
-}: {
-  params: { username: string };
-}) {
+interface PageProps {
+  params: {
+    username: string;
+  };
+}
+
+export default function UserProfilePage({ params }: PageProps) {
+  const { username } = params;
   // const { username } = params;
-  const username = params.username as string;
+  // const username = params.username as string;
   const [userData, setUserData] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState<any>(null);
