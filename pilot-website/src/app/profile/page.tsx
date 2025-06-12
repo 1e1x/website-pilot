@@ -3,15 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getSession } from "next-auth/react";
+import type { Session } from "next-auth";
 import { getUserByIdAction } from "../actions/server-actions";
+import type { User } from "@prisma/client";
 
 export default function ProfilePage() {
-  const [userData, setUserData] = useState<any>(null);
-  const [editData, setEditData] = useState<any>(null);
-  const [isCurrentUser, setIsCurrentUser] = useState(false);
-  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
-  const [session, setSession] = useState<any>(null); // use 'any' to allow user.id access
-
+  const [userData, setUserData] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -20,39 +18,45 @@ export default function ProfilePage() {
         const currentSession = await getSession();
         if (!currentSession) {
           console.error("No session found.");
+          void router.push("/login"); // Redirect to login if no session
           return;
         }
 
-        setSession(currentSession);
-        const username = currentSession.user.name;
-        const userId = currentSession.user.id;
+        const username = currentSession.user?.name;
+        const userId = currentSession.user?.id;
+
+        if (!username || !userId) {
+          console.error("Missing user information in session");
+          void router.push("/login");
+          return;
+        }
 
         const fetchedUserData = await getUserByIdAction(userId);
         setUserData(fetchedUserData);
 
         if (fetchedUserData?.name) {
-          setIsCurrentUser(username === fetchedUserData.name);
-          console.log("Username:", username);
-          console.log("UserData name:", fetchedUserData.name);
-          
-          router.push(`/profile/${username}`);
+          void router.push(`/profile/${username}`);
         } else {
-        router.push(`not-found`);
-
+          void router.push(`/not-found`);
         }
       } catch (error) {
         console.error("Error loading user:", error);
+        void router.push("/error");
       } finally {
-        setIsLoadingProfile(false);
+        setIsLoading(false);
       }
     }
 
-    loadUser();
+    void loadUser();
   }, [router]);
 
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="animate-pulse">Redirecting to your profile...</div>
-    </div>
-  );
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="animate-pulse">Redirecting to your profile...</div>
+      </div>
+    );
+  }
+
+  return null;
 }

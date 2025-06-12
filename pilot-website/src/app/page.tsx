@@ -218,7 +218,7 @@ const workshopsData = [
     id: "ws-foundations",
     name: "Foundations: Bootcamp for Rapid Prototyping in the Age of Vibe Coding",
     description:
-      "Learn the essentials of quick prototyping and modern 'vibe coding' techniques to bring your ideas to life faster than ever. Perfect for aspiring innovators!",
+      "Learn the essentials of quick prototyping and modern &apos;vibe coding&apos; techniques to bring your ideas to life faster than ever. Perfect for aspiring innovators!",
     image_url: "/placeholder.svg?height=180&width=300",
     event_date: "2025-06-01",
     event_time: "10:00 AM",
@@ -321,7 +321,7 @@ function ProjectCard({ project }: { project: (typeof projectsData)[0] }) {
   const owner = getMemberById(project.owner_id);
 
   return (
-    <a href={`/project/${project.id}`} className="block">
+    <Link href={`/project/${project.id}`} className="block">
       <Card className="w-80 flex-shrink-0 transition-shadow hover:shadow-lg">
         <div className="aspect-video overflow-hidden rounded-t-lg bg-gray-100">
           <img
@@ -363,7 +363,7 @@ function ProjectCard({ project }: { project: (typeof projectsData)[0] }) {
           </div>
         </CardContent>
       </Card>
-    </a>
+    </Link>
   );
 }
 
@@ -486,24 +486,28 @@ function WorkshopCard({ workshop }: { workshop: (typeof workshopsData)[0] }) {
 export default function HomePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [session, setSession] = useState<Object | null>(null);
+  const [session, setSession] = useState<object | null>(null);
 
   useEffect(() => {
     async function checkAuth() {
-      const currentSession = await getSession();
-      setSession(currentSession);
+      try {
+        const currentSession = await getSession();
+        setSession(currentSession);
 
-      // if (!currentSession) {
-      //   router.push("/login");
-      //   console.log("No session", currentSession);
-      // } else {
-      //   console.log("Session found", currentSession);
-      // }
-
-      setLoading(false);
+        // if (!currentSession) {
+        //   router.push("/login");
+        //   console.log("No session", currentSession);
+        // } else {
+        //   console.log("Session found", currentSession);
+        // }
+      } catch (error) {
+        console.error("Auth check failed:", error);
+      } finally {
+        setLoading(false);
+      }
     }
 
-    checkAuth();
+    void checkAuth();
   }, [router]);
 
   if (loading) return <p>Loading...</p>;
@@ -630,38 +634,38 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl text-center">
           <p className="mb-6">© 2025 1e1x. All rights reserved.</p>
           <div className="flex justify-center space-x-6">
-            <a
+            <Link
               href="https://www.instagram.com/1e1x_qatar/"
               target="_blank"
               rel="noopener noreferrer"
               className="transition-colors hover:text-white"
             >
               Instagram
-            </a>
-            <a
+            </Link>
+            <Link
               href="https://twitter.com/1e1x_qatar/"
               target="_blank"
               rel="noopener noreferrer"
               className="transition-colors hover:text-white"
             >
               Twitter
-            </a>
-            <a
+            </Link>
+            <Link
               href="https://www.linkedin.com/company/1e1x/"
               target="_blank"
               rel="noopener noreferrer"
               className="transition-colors hover:text-white"
             >
               LinkedIn
-            </a>
-            <a
+            </Link>
+            <Link
               href="https://www.facebook.com/1e1x.qatar/"
               target="_blank"
               rel="noopener noreferrer"
               className="transition-colors hover:text-white"
             >
               Facebook
-            </a>
+            </Link>
           </div>
         </div>
       </footer>

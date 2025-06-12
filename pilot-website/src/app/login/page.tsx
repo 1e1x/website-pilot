@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useEffect, useState } from "react"
+import Link from "next/link"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Input } from "~/components/ui/input"
@@ -19,13 +20,17 @@ export default function LoginPage() {
 
   useEffect(() => {
     async function checkAuth() {
-      const session = await getSession();
-      if (session) {
-        router.push("/");
+      try {
+        const session = await getSession();
+        if (session) {
+          void router.push("/");
+        }
+      } catch (error) {
+        console.error("Auth check failed:", error);
       }
     }
 
-    checkAuth();
+    void checkAuth();
   }, [router]);
 
 
@@ -35,15 +40,20 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
 
   const handleGoogleLogin = async () => {
-    setIsLoading(true)
-    
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    setIsLoading(false)
-    // Here you would integrate with actual Google OAuth
-
-    await signIn("google")
-    console.log("Google login initiated")
+    try {
+      setIsLoading(true)
+      
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+      
+      // Here you would integrate with actual Google OAuth
+      await signIn("google")
+      console.log("Google login initiated")
+    } catch (error) {
+      console.error("Google login failed:", error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleEmailLogin = async (e: React.FormEvent) => {
@@ -67,10 +77,10 @@ export default function LoginPage() {
       <div className="w-full max-w-md relative z-10">
         {/* Back to Home */}
         <div className="mb-8">
-          <a href="/" className="inline-flex items-center text-gray-600 hover:text-black transition-colors group">
+          <Link href="/" className="inline-flex items-center text-gray-600 hover:text-black transition-colors group">
             <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
             Back to 1e1x
-          </a>
+          </Link>
         </div>
 
         <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
@@ -216,10 +226,10 @@ export default function LoginPage() {
             {/* Sign Up Link */}
             <div className="text-center">
               <p className="text-sm text-gray-600">
-                Don't have an account?{" "}
-                <a href="/signup" className="font-medium text-black hover:text-gray-800 transition-colors">
+                Don&apos;t have an account?{" "}
+                <Link href="/signup" className="font-medium text-black hover:text-gray-800 transition-colors">
                   Join the innovation! 🌟
-                </a>
+                </Link>
               </p>
             </div>
 
@@ -227,13 +237,13 @@ export default function LoginPage() {
             <div className="text-center pt-4 border-t border-gray-200">
               <p className="text-xs text-gray-500">
                 By signing in, you agree to our{" "}
-                <a href="#" className="text-black hover:underline">
+                <Link href="/terms" className="text-black hover:underline">
                   Terms of Service
-                </a>{" "}
+                </Link>{" "}
                 and{" "}
-                <a href="#" className="text-black hover:underline">
+                <Link href="/privacy" className="text-black hover:underline">
                   Privacy Policy
-                </a>
+                </Link>
               </p>
             </div>
           </CardContent>
