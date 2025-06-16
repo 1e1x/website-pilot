@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import React from 'react'
 import { Button } from '~/components/ui/button'
 
@@ -7,10 +8,10 @@ export default function page() {
         <div className="text-center">
           <h2 className="mb-2 text-2xl font-bold">User not found</h2>
           <p className="mb-6 text-gray-600">
-            The profile you're looking for doesn't exist or has been removed.
+            {`The profile you're looking for doesn't exist or has been removed.`}
           </p>
           <Button asChild>
-            <a href="/">Return to Home</a>
+            <Link href="/">Return to Home</Link>
           </Button>
         </div>
       </div>

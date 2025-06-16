@@ -2,11 +2,10 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 
-import { Link } from "lucide-react";
+import Link from "next/link";
 import { getSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import type { Session } from "next-auth";
-
 
 export default function Navigation() {
   const router = useRouter();
@@ -15,13 +14,16 @@ export default function Navigation() {
 
   useEffect(() => {
     async function checkAuth() {
-      const currentSession = await getSession();
-      setSession(currentSession);
+      try {
+        const currentSession = await getSession();
+        setSession(currentSession);
+      } catch (err) {
+        console.error("Error getting session", err);
+      }
     }
 
-    checkAuth();
+    void checkAuth();
   }, [router]);
-
   return (
     <nav className="fixed top-0 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur-sm">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -33,30 +35,30 @@ export default function Navigation() {
             1e1x
           </div>
           <div className="hidden space-x-8 md:flex">
-            <a
+            <Link
               href="/projects"
               className="text-gray-600 transition-colors hover:text-black"
             >
               Projects
-            </a>
-            <a
+            </Link>
+            <Link
               href="/talent"
               className="text-gray-600 transition-colors hover:text-black"
             >
               Talent
-            </a>
-            <a
+            </Link>
+            <Link
               href="/arena"
               className="text-gray-600 transition-colors hover:text-black"
             >
               Arena
-            </a>
-            <a
+            </Link>
+            <Link
               href="/workshops"
               className="text-gray-600 transition-colors hover:text-black"
             >
               Workshops
-            </a>
+            </Link>
           </div>
           <div className="flex items-center space-x-4">
             {!session && (

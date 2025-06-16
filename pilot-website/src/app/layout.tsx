@@ -5,7 +5,7 @@ import { Geist } from "next/font/google";
 
 import { TRPCReactProvider } from "~/trpc/react";
 import Navigation from "~/components/ui/navigation";
-import { Button } from "~/components/ui/button";
+// import { Button } from "~/components/ui/button";
 
 export const metadata: Metadata = {
   title: "1e1x",

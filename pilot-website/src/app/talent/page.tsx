@@ -6,6 +6,7 @@ import { Card, CardContent } from "~/components/ui/card"
 import { Input } from "~/components/ui/input"
 import { Badge } from "~/components/ui/badge"
 import { Search } from "lucide-react"
+import Image from "next/image"
 
 // Mock user data - in real app this would come from your database
 const talentData = [
@@ -182,7 +183,7 @@ export default function TalentPage() {
                 <Card className="h-full hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
                     <div className="flex items-center gap-4 mb-4">
-                      <img
+                      <Image
                         src={user.avatar_url || "/placeholder.svg"}
                         alt={`${user.firstName} ${user.lastName}`}
                         className="w-16 h-16 rounded-full object-cover"

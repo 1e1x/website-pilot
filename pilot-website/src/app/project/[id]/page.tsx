@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent } from "~/components/ui/card"
 import { Calendar, ExternalLink } from "lucide-react"
+import Image from "next/image"
 
 // Data definitions (shared with main page)
 const membersData = [
@@ -283,10 +284,11 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 								return (
 									<Card key={member.id} className="text-center">
 										<CardContent className="p-4">
-											<img
+											<Image
 												src={member.avatar_url ?? "/placeholder.svg"}
 												alt={member.name}
 												className="w-20 h-20 rounded-full mx-auto mb-3 object-cover border-2 border-gray-200"
+												fill
 											/>
 											<h3 className="font-semibold text-sm">{member.name}</h3>
 											<p className="text-xs text-gray-600">{member.roles.join(", ")}</p>
@@ -343,14 +345,14 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 										<div className="flex-1">
 											<p className="font-semibold text-sm mb-2">{post.platform}:</p>
 											<p className="text-sm text-gray-700 mb-3">&quot;{post.content}&quot;</p>
-											<a
+											<Link
 												href={post.link}
 												target="_blank"
 												rel="noopener noreferrer"
 												className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800"
 											>
 												View Post <ExternalLink className="ml-1 h-3 w-3" />
-											</a>
+											</Link>
 										</div>
 									</div>
 								</CardContent>
