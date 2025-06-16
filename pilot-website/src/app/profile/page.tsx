@@ -34,11 +34,14 @@ export default function ProfilePage() {
         const fetchedUserData = await getUserByIdAction(userId);
         setUserData(fetchedUserData);
 
-        if (fetchedUserData?.name) {
+        if (fetchedUserData && fetchedUserData.name) {
+          console.log("Redirecting to profile:", fetchedUserData.name);
           void router.push(`/profile/${username}`);
         } else {
+          console.warn("User not found or malformed data:", fetchedUserData);
           void router.push(`/not-found`);
         }
+        
       } catch (error) {
         console.error("Error loading user:", error);
         void router.push("/error");
