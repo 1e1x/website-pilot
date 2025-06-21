@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
   ChevronLeft,
@@ -269,22 +269,29 @@ function Carousel({
   children: React.ReactNode;
   className?: string;
 }) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const [scrollPosition, setScrollPosition] = useState(0);
-  const [containerRef, setContainerRef] = useState<HTMLDivElement | null>(null);
 
   const scroll = (direction: "left" | "right") => {
-    if (containerRef) {
+    if (containerRef.current) {
       const scrollAmount = 320;
       const newPosition =
         direction === "left"
           ? Math.max(0, scrollPosition - scrollAmount)
           : scrollPosition + scrollAmount;
 
-      containerRef.scrollTo({
+      containerRef.current.scrollTo({
         left: newPosition,
         behavior: "smooth",
       });
       setScrollPosition(newPosition);
+    }
+  };
+
+  // Update scrollPosition on manual touch scroll
+  const handleScroll = () => {
+    if (containerRef.current) {
+      setScrollPosition(containerRef.current.scrollLeft);
     }
   };
 
@@ -299,8 +306,9 @@ function Carousel({
         <ChevronLeft className="h-4 w-4" />
       </Button>
       <div
-        ref={setContainerRef}
-        className={`flex gap-6 overflow-x-hidden scroll-smooth pb-4 ${className}`}
+        ref={containerRef}
+        onScroll={handleScroll}
+        className={`flex gap-6 overflow-x-auto  scroll-smooth pb-4 ${className}`}
       >
         {children}
       </div>
