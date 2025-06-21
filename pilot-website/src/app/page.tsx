@@ -332,11 +332,11 @@ function ProjectCard({ project }: { project: (typeof projectsData)[0] }) {
     <a href={`/project/${project.id}`} className="block">
       <Card className="w-80 flex-shrink-0 transition-shadow hover:shadow-lg">
         <div className="aspect-video overflow-hidden rounded-t-lg bg-gray-100">
-          <img
+          {/* <img
             src={project.image_url || "/placeholder.svg"}
             alt={project.name}
-            className="h-full w-full object-cover"
-          />
+            // className="h-full w-full object-cover"
+          /> */}
         </div>
         <CardContent className="p-6">
           <h3 className="mb-2 truncate text-lg font-semibold">
@@ -360,14 +360,14 @@ function ProjectCard({ project }: { project: (typeof projectsData)[0] }) {
             ))}
           </div>
           <div className="flex items-center gap-4 text-sm text-gray-500">
-            <div className="flex items-center">
+            {/* <div className="flex items-center">
               <Heart className="mr-1 h-4 w-4" />
               <span>{project.likes_count}</span>
-            </div>
-            <div className="flex items-center">
+            </div> */}
+            {/* <div className="flex items-center">
               <MessageCircle className="mr-1 h-4 w-4" />
               <span>{project.comments_count}</span>
-            </div>
+            </div> */}
           </div>
         </CardContent>
       </Card>
@@ -383,7 +383,7 @@ function TalentCard({ member }: { member: (typeof membersData)[0] }) {
         <div className="mb-4">
           <img
             src={member.avatar_url || "/placeholder.svg"}
-            alt={member.name}
+            // alt={member.name}
             className="mx-auto h-20 w-20 rounded-full border-2 border-gray-200 object-cover"
           />
         </div>
@@ -418,7 +418,7 @@ function ContestCard({ contest }: { contest: (typeof contestsData)[0] }) {
   };
 
   return (
-    <Card className="w-80 flex-shrink-0 transition-shadow hover:shadow-lg">
+    <Card className="w-80 flex-shrink-0 transition-shadow hover:shadow-lg h-100">
       <CardContent className="p-6">
         <span
           className={`mb-3 inline-block rounded px-3 py-1 text-xs font-medium ${getStatusColor(contest.status)}`}
@@ -443,8 +443,8 @@ function ContestCard({ contest }: { contest: (typeof contestsData)[0] }) {
             <span>{contest.teams_registered_count} Teams</span>
           </div>
         </div>
-        <Button size="sm" className="w-full">
-          Learn More
+        <Button size="sm" className="w-full disabled"> 
+          Coming Soon
         </Button>
       </CardContent>
     </Card>
@@ -527,7 +527,7 @@ export default function HomePage() {
       <section className="bg-gray-50 px-4 pt-24 pb-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="mb-6 text-4xl font-bold text-black md:text-5xl">
-            Ignite Your Ideas. Build the Future. 🔥
+            Ignite Your Ideas. Build the Future.
           </h1>
           <p className="mx-auto mb-8 max-w-3xl text-xl text-gray-600">{`
             Connect with brilliant minds, launch groundbreaking projects, and
@@ -549,7 +549,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl">
           <div className="mb-12 text-center">
             <h2 className="mb-4 text-3xl font-bold md:text-4xl">
-              Featured Projects ✨
+              Featured Projects
             </h2>
             <p className="mx-auto max-w-3xl text-xl text-gray-600">
               Dive into innovative ventures shaping tomorrow. Discover, support,
@@ -572,7 +572,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl">
           <div className="mb-12 text-center">
             <h2 className="mb-4 text-3xl font-bold md:text-4xl">
-              Featured Talent 🌟
+              Featured Talent
             </h2>
             <p className="mx-auto max-w-3xl text-xl text-gray-600">
               Meet the brilliant minds driving innovation. Find collaborators,
@@ -595,7 +595,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl">
           <div className="mb-12 text-center">
             <h2 className="mb-4 text-3xl font-bold md:text-4xl">
-              Arena Challenges 🏆
+              Arena Challenges
             </h2>
             <p className="mx-auto max-w-3xl text-xl text-gray-600">
               Test your skills, compete, and win! Join our thrilling coding
@@ -614,7 +614,7 @@ export default function HomePage() {
       </section>
 
       {/* Workshops & Training */}
-      <section id="workshops" className="bg-gray-50 px-4 py-16 sm:px-6 lg:px-8">
+      {/* <section id="workshops" className="bg-gray-50 px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="mb-12 text-center">
             <h2 className="mb-4 text-3xl font-bold md:text-4xl">
@@ -634,7 +634,7 @@ export default function HomePage() {
             <Button variant="outline">View All Workshops</Button>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Footer */}
       <footer className="bg-gray-900 px-4 py-12 text-gray-400 sm:px-6 lg:px-8">

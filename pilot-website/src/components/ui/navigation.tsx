@@ -41,24 +41,24 @@ export default function Navigation() {
             >
               Projects
             </Link>
-            <Link
+            {/* <Link
               href="/talent"
               className="text-gray-600 transition-colors hover:text-black"
             >
               Talent
-            </Link>
+            </Link> */}
             <Link
               href="/arena"
               className="text-gray-600 transition-colors hover:text-black"
             >
               Arena
             </Link>
-            <Link
+            {/* <Link
               href="/workshops"
               className="text-gray-600 transition-colors hover:text-black"
             >
               Workshops
-            </Link>
+            </Link> */}
           </div>
           <div className="flex items-center space-x-4">
             {!session && (
