@@ -7,6 +7,7 @@ import { Input } from "~/components/ui/input"
 import { Badge } from "~/components/ui/badge"
 import { Search } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 
 // Mock user data - in real app this would come from your database
 const talentData = [
@@ -179,7 +180,7 @@ export default function TalentPage() {
           {/* Talent Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredTalent.map((user) => (
-              <a href={`/profile/${user.username}`} key={user.id} className="block">
+              <Link href={`/profile/${user.username}`} key={user.id} className="block">
                 <Card className="h-full hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
                     <div className="flex items-center gap-4 mb-4">
@@ -232,7 +233,7 @@ export default function TalentPage() {
                     </div>
                   </CardContent>
                 </Card>
-              </a>
+              </Link>
             ))}
           </div>
 
